@@ -35,7 +35,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: echo "$VITE_SUPABASE_PROJECT_URL"
+        run: npm run build
         env:
           VITE_SUPABASE_PROJECT_URL: ${{ secrets.VITE_SUPABASE_PROJECT_URL }}
           VITE_SUPABASE_API_KEY: ${{ secrets.VITE_SUPABASE_API_KEY }}
