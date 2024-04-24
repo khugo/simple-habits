@@ -51,11 +51,13 @@ export const Habit = (props: { habit: Habit }) => {
       ) : (
         <>
           <HabitEntryCalendar entries={habitEntries} />
-          <DoneButton
-            onClick={addHabitEntry}
-            isDone={isDone}
-            isLoading={submitLoading}
-          />
+          <div style={{ marginTop: "-20px" }}>
+            <DoneButton
+              onClick={addHabitEntry}
+              isDone={isDone}
+              isLoading={submitLoading}
+            />
+          </div>
         </>
       )}
     </div>
@@ -68,7 +70,7 @@ const DoneButton = (props: {
   onClick: () => void;
 }) => {
   if (props.isDone) {
-    return <p>Done for today</p>;
+    return <p>Done</p>;
   }
   return (
     <button
@@ -91,7 +93,6 @@ const HabitEntryCalendar = (props: { entries: HabitEntry[] }) => {
       })),
     [props.entries],
   );
-  console.log(data);
   return (
     <div style={{ height: 115 }}>
       <ResponsiveCalendar
