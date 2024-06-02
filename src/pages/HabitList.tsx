@@ -15,7 +15,7 @@ export function HabitList() {
   }
 
   return (
-    <div className="h-full grid flex-col">
+    <div className="grid flex-col space-y-4 pb-2">
       {habits.map((habit) => (
         <Habit habit={habit} key={habit.id} />
       ))}

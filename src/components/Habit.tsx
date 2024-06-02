@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { ResponsiveCalendar } from "@nivo/calendar";
 import { format, isSameDay, startOfYear } from "date-fns";
@@ -16,7 +16,7 @@ export type HabitEntry = {
 };
 
 export const Habit = (props: { habit: Habit }) => {
-  const habitEntries = useHabitEntries(props.habit.id);
+  const { data: habitEntries, reload } = useHabitEntries(props.habit.id);
   const [isDone, setIsDone] = useState<undefined | boolean>(undefined);
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -37,6 +37,7 @@ export const Habit = (props: { habit: Habit }) => {
         habit_id: props.habit.id,
         timestamp,
       });
+      await reload();
       setIsDone(true);
     } finally {
       setSubmitLoading(false);
@@ -75,7 +76,7 @@ const DoneButton = (props: {
   return (
     <button
       onClick={!props.isDone && !props.isLoading ? props.onClick : undefined}
-      className="bg-indigo-600 w-fit py-1.5 px-3 rounded-md text-white font-semibold leading-6 text-sm"
+      className="bg-indigo-600 w-fit py-1.5 px-4 rounded-md text-white font-semibold leading-6 text-m z-10"
     >
       {props.isLoading ? "⌛" : "Did it!"}
     </button>
@@ -114,12 +115,18 @@ const HabitEntryCalendar = (props: { entries: HabitEntry[] }) => {
 
 const useHabitEntries = (habitId: string) => {
   const [entries, setEntries] = useState<HabitEntry[] | undefined>(undefined);
-  useEffect(() => {
-    supabase
+
+  const updateHabits = useCallback(() => {
+    return supabase
       .from("habits_entries")
       .select("*")
       .eq("habit_id", habitId)
       .then(({ data }) => setEntries(data as HabitEntry[]));
   }, [habitId]);
-  return entries;
+
+  useEffect(() => {
+    updateHabits();
+  }, [habitId, updateHabits]);
+
+  return { data: entries, reload: updateHabits };
 };
