@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { ResponsiveCalendar } from "@nivo/calendar";
 import { format, isSameDay, startOfYear } from "date-fns";
-import { getActiveDate } from "../utils/date";
+import { useActiveDate } from "../utils/date";
 
 export type Habit = {
   id: string;
@@ -19,18 +19,19 @@ export const Habit = (props: { habit: Habit }) => {
   const { data: habitEntries, reload } = useHabitEntries(props.habit.id);
   const [isDone, setIsDone] = useState<undefined | boolean>(undefined);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const { activeDate } = useActiveDate();
 
   useEffect(() => {
-    if (isDone !== undefined || !habitEntries) return;
+    if (!habitEntries) return;
     setIsDone(
       habitEntries.some((entry) =>
-        isSameDay(getActiveDate(), new Date(entry.timestamp)),
+        isSameDay(activeDate, new Date(entry.timestamp)),
       ),
     );
-  }, [isDone, habitEntries]);
+  }, [isDone, habitEntries, activeDate]);
 
   const addHabitEntry = async () => {
-    const timestamp = getActiveDate();
+    const timestamp = activeDate;
     try {
       setSubmitLoading(true);
       await supabase.from("habits_entries").insert({

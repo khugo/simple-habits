@@ -1,13 +1,9 @@
-import { addDays, endOfDay, format, getDate, subDays } from "date-fns";
+import { addDays, endOfDay, format, subDays } from "date-fns";
 
-import { useUrlState } from "../utils/url";
-import { getActiveDate } from "../utils/date";
+import { useActiveDate } from "../utils/date";
 
 export const ActiveDate = () => {
-  const { queryParam: activeDate, setQueryParam: setActiveDate } = useUrlState(
-    "date",
-    getActiveDate().toISOString(),
-  );
+  const { activeDate, setActiveDate } = useActiveDate();
   const isToday = endOfDay(new Date(activeDate)) >= endOfDay(new Date());
 
   const changeDate = (operation: "back" | "forward") => {

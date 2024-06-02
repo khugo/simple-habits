@@ -2,7 +2,6 @@ import { useCallback } from "react";
 
 export const useUrlState = (key: string, defaultValue: string) => {
   const queryParams = getCurrentQueryParams();
-  console.log("query params", queryParams);
   const state = queryParams.get(key) ?? defaultValue;
 
   const deleteQueryParam = useCallback(() => {
