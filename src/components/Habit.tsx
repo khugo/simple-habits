@@ -53,7 +53,7 @@ export const Habit = (props: { habit: Habit }) => {
       ) : (
         <>
           <HabitEntryCalendar entries={habitEntries} />
-          <div style={{ marginTop: "-20px" }}>
+          <div>
             <DoneButton
               onClick={addHabitEntry}
               isDone={isDone}
