@@ -9,11 +9,13 @@ export default function Auth() {
     event.preventDefault();
 
     setLoading(true);
+    const emailRedirectTo =
+      window.location.hostname === "khugo.github.io"
+        ? window.location.origin + "/simple-habits/"
+        : window.location.origin;
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: {
-        emailRedirectTo: window.location.origin,
-      },
+      options: { emailRedirectTo },
     });
 
     if (error) {
