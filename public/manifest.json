@@ -1,0 +1,12 @@
+{
+    "name": "Simple Habits",
+    "start_url": "https://khugo.github.io/simple-habits",
+    "display": "fullscreen",
+    "icons": [
+        {
+            "src": "icons/web/apple-touch-icon.png",
+            "type": "image/png",
+            "sizes": "180x180"
+        }
+    ]
+}
