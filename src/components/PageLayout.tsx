@@ -1,9 +1,11 @@
+import { supabase } from "../supabaseClient";
 import { ActiveDate } from "./ActiveDate";
 
 export const PageLayout = (props: { children: React.ReactNode }) => (
   <div className={"container mx-auto h-screen flex flex-col p-4"}>
     <Header />
     {props.children}
+    <Logout />
   </div>
 );
 
@@ -13,5 +15,17 @@ const Header = () => {
       <h1 className="font-sans text-4xl mx-auto">Simple Habits</h1>
       <ActiveDate />
     </div>
+  );
+};
+
+const Logout = () => {
+  return (
+    <button
+      onClick={() => {
+        supabase.auth.signOut();
+      }}
+    >
+      Logout
+    </button>
   );
 };
