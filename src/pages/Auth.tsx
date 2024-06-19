@@ -7,6 +7,7 @@ export default function Auth() {
 
   const handleLogin = async (event) => {
     event.preventDefault();
+    if (email !== "kiiskihugo@gmail.com") return;
 
     setLoading(true);
     const emailRedirectTo =
