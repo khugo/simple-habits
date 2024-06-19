@@ -22,12 +22,8 @@ function App() {
   return <PageLayout isLoggedIn={!!session}>{page}</PageLayout>;
 
   function getPage() {
-    const pathname = window.location.pathname;
-    if (pathname === "/auth") {
-      return <Auth />;
-    }
     if (!session) {
-      return <div>No session. Please log in.</div>;
+      return <Auth />;
     }
     return <HabitList />;
   }
