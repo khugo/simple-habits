@@ -22,8 +22,12 @@ function App() {
   return <PageLayout>{page}</PageLayout>;
 
   function getPage() {
-    if (!session) {
+    const pathname = window.location.pathname;
+    if (pathname === "/auth") {
       return <Auth />;
+    }
+    if (!session) {
+      return <div>No session. Please log in.</div>;
     }
     return <HabitList />;
   }
