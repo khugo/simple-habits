@@ -19,7 +19,7 @@ function App() {
   }, []);
 
   const page = getPage();
-  return <PageLayout>{page}</PageLayout>;
+  return <PageLayout isLoggedIn={!!session}>{page}</PageLayout>;
 
   function getPage() {
     const pathname = window.location.pathname;

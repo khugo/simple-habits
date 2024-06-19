@@ -1,11 +1,14 @@
 import { supabase } from "../supabaseClient";
 import { ActiveDate } from "./ActiveDate";
 
-export const PageLayout = (props: { children: React.ReactNode }) => (
+export const PageLayout = (props: {
+  children: React.ReactNode;
+  isLoggedIn: boolean;
+}) => (
   <div className={"container mx-auto h-screen flex flex-col p-4"}>
     <Header />
     {props.children}
-    <Logout />
+    {props.isLoggedIn && <Logout />}
   </div>
 );
 
