@@ -53,28 +53,28 @@ export default function Auth() {
           </form>
         </div>
       </div>
-      <ManualSession />
+      <ManualLink />
     </div>
   );
 }
 
-const ManualSession = () => {
-  const [sessionString, setSessionString] = useState<string | null>(null);
+const ManualLink = () => {
+  const [loginLink, setLoginLink] = useState<string | null>(null);
 
   const submit = () => {
-    if (!sessionString) return;
-    supabase.auth.setSession(JSON.parse(sessionString));
+    if (!loginLink) return;
+    window.location.href = loginLink;
   };
 
   return (
     <div className="flex flex-col mt-2">
-      <h2>Or set your session manually</h2>
+      <h2>Click the link or paste it here on PWAs</h2>
       <textarea
-        placeholder="Paste session JSON here"
-        onChange={(e) => setSessionString(e.target.value)}
+        placeholder="Paste login link from email here"
+        onChange={(e) => setLoginLink(e.target.value)}
       />
-      <button onClick={submit} disabled={!sessionString} className="mr-auto">
-        Set session
+      <button onClick={submit} disabled={!loginLink} className="mr-auto">
+        Done
       </button>
     </div>
   );
