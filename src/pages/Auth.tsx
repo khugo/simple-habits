@@ -7,6 +7,7 @@ export default function Auth() {
 
   const handleLogin = async (event) => {
     event.preventDefault();
+    // Prevent bots from sending spam to random emails
     if (email !== "kiiskihugo@gmail.com") return;
 
     setLoading(true);
