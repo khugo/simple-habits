@@ -6,7 +6,7 @@ import Auth from "./pages/Auth";
 import { PageLayout } from "./components/PageLayout";
 
 function App() {
-  const [session, setSession] = useState(null);
+  const [session, setSession] = useState(undefined);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -22,7 +22,10 @@ function App() {
   return <PageLayout isLoggedIn={!!session}>{page}</PageLayout>;
 
   function getPage() {
-    if (!session) {
+    if (session === undefined) {
+      return <div>Loading...</div>
+    }
+    if (session === null) {
       return <Auth />;
     }
     return <HabitList />;
