@@ -7,6 +7,8 @@ import { useActiveDate } from "../utils/date";
 export type Habit = {
   id: string;
   name: string;
+  archivedAt?: Date
+  createdAt: Date
 };
 
 export type HabitEntry = {
