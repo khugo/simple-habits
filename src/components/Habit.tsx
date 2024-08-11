@@ -49,6 +49,24 @@ export const Habit = (props: { habit: Habit }) => {
     }
   };
 
+  const removeHabitEntry = async () => {
+    const timeframeStart = startOfDay(selectedDate);
+    const timeframeEnd = endOfDay(selectedDate);
+    try {
+      setSubmitLoading(true);
+      await supabase
+        .from("habits_entries")
+        .delete()
+        .eq("habit_id", props.habit.id)
+        .gte("timestamp", timeframeStart.toISOString())
+        .lte("timestamp", timeframeEnd.toISOString());
+      await reload();
+      setIsDone(false);
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col">
       <h2 className="text-2xl">{props.habit.name}</h2>
@@ -59,7 +77,8 @@ export const Habit = (props: { habit: Habit }) => {
           <HabitEntryCalendar entries={habitEntries} />
           <div>
             <DoneButton
-              onClick={addHabitEntry}
+              onDone={addHabitEntry}
+              onNotDone={removeHabitEntry}
               isDone={isDone}
               isLoading={submitLoading}
             />
@@ -73,14 +92,15 @@ export const Habit = (props: { habit: Habit }) => {
 const DoneButton = (props: {
   isDone: boolean;
   isLoading: boolean;
-  onClick: () => void;
+  onDone: () => void;
+  onNotDone: () => void;
 }) => {
   if (props.isDone) {
-    return <p>Done</p>;
+    return <p onClick={props.onNotDone}>Done ×</p>;
   }
   return (
     <button
-      onClick={!props.isDone && !props.isLoading ? props.onClick : undefined}
+      onClick={!props.isDone && !props.isLoading ? props.onDone : undefined}
       className="bg-indigo-600 w-fit py-1.5 px-4 rounded-md text-white font-semibold leading-6 text-m z-10"
     >
       {props.isLoading ? "⌛" : "Did it!"}
