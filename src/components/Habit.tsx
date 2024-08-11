@@ -1,8 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabaseClient";
-import { ResponsiveCalendar } from "@nivo/calendar";
-import { endOfDay, format, isSameDay, startOfDay, startOfYear } from "date-fns";
+import {
+  eachDayOfInterval,
+  endOfDay,
+  endOfYear,
+  isSameDay,
+  startOfDay,
+  startOfYear,
+} from "date-fns";
 import { useGlobalState } from "../contexts/GlobalState.tsx";
+import { HabitCalendar } from "./HabitCalendar.tsx";
 
 export type Habit = {
   id: string;
@@ -75,7 +82,7 @@ export const Habit = (props: { habit: Habit }) => {
       ) : (
         <>
           <HabitEntryCalendar entries={habitEntries} />
-          <div>
+          <div className={"pt-2"}>
             <DoneButton
               onDone={addHabitEntry}
               onNotDone={removeHabitEntry}
@@ -101,48 +108,57 @@ const DoneButton = (props: {
   return (
     <button
       onClick={!props.isDone && !props.isLoading ? props.onDone : undefined}
-      className="bg-indigo-600 w-fit py-1.5 px-4 rounded-md text-white font-semibold leading-6 text-m z-10"
+      className="bg-indigo-500 w-fit py-1.5 px-4 rounded-md text-white font-semibold leading-6 text-m z-10"
     >
       {props.isLoading ? "⌛" : "Did it!"}
     </button>
   );
 };
 
+const allDatesOfThisYear = getAllDatesOfThisYear();
+
 const HabitEntryCalendar = (props: { entries: HabitEntry[] }) => {
-  const today = new Date();
-  const from = startOfYear(today);
+  const entriesByDate = useMemo(() => {
+    return new Map(
+      props.entries.map((entry) => [
+        startOfDay(new Date(entry.timestamp)).getTime(),
+        entry,
+      ]),
+    );
+  }, [props.entries]);
   const data = useMemo(
     () =>
-      props.entries.map((entry) => ({
-        day: format(new Date(entry.timestamp), "yyyy-MM-dd"),
-        value: 1,
+      allDatesOfThisYear.map((date) => ({
+        date,
+        value: entriesByDate.get(date.getTime()) ? 1 : 0,
       })),
-    [props.entries],
+    [entriesByDate],
   );
+  const svg = HabitCalendar(data, {
+    x: (d) => d.date,
+    y: (d) => d.value,
+    weekday: "monday",
+  });
   return (
-    <div style={{ height: 115 }}>
-      <ResponsiveCalendar
-        data={data}
-        from={from}
-        to={today}
-        monthBorderColor="#ffffff"
-        dayBorderWidth={2}
-        dayBorderColor="#ffffff"
-        height={115}
-        colors={["#61cdbb", "#97e3d5", "#e8c1a0", "#f47560"]}
-        yearSpacing={40}
-        emptyColor="#eeeeee"
-        isInteractive={false}
-      />
-    </div>
+    <div
+      dangerouslySetInnerHTML={{
+        __html: svg.outerHTML,
+      }}
+    />
   );
 };
+
+function getAllDatesOfThisYear() {
+  const start = startOfYear(new Date());
+  const end = endOfYear(new Date());
+  return eachDayOfInterval({ start, end });
+}
 
 const useHabitEntries = (habitId: string) => {
   const [entries, setEntries] = useState<HabitEntry[] | undefined>(undefined);
 
-  const updateHabits = useCallback(() => {
-    return supabase
+  const updateHabits = useCallback(async () => {
+    await supabase
       .from("habits_entries")
       .select("*")
       .eq("habit_id", habitId)
@@ -150,7 +166,7 @@ const useHabitEntries = (habitId: string) => {
   }, [habitId]);
 
   useEffect(() => {
-    updateHabits();
+    void updateHabits();
   }, [habitId, updateHabits]);
 
   return { data: entries, reload: updateHabits };
