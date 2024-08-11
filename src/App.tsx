@@ -1,4 +1,3 @@
-import React from "react";
 import { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
 import { HabitList } from "./pages/HabitList";
@@ -10,11 +9,11 @@ function App() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+      setSession(session as any);
     });
 
     supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      setSession(session as any);
     });
   }, []);
 
@@ -23,7 +22,7 @@ function App() {
 
   function getPage() {
     if (session === undefined) {
-      return <div>Loading...</div>
+      return <div>Loading...</div>;
     }
     if (session === null) {
       return <Auth />;
