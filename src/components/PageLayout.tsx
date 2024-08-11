@@ -5,7 +5,7 @@ export const PageLayout = (props: {
   children: React.ReactNode;
   isLoggedIn: boolean;
 }) => (
-  <div className={"container mx-auto h-screen flex flex-col p-4"}>
+  <div className={"container mx-auto h-screen flex flex-col px-2 py-3"}>
     <Header />
     {props.children}
     {props.isLoggedIn && <Logout />}
