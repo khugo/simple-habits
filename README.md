@@ -21,3 +21,4 @@ automatically when you push to the `master` branch.
 
 - [ ] Highlight selected date in calendar
 - [ ] Dark mode
+- [ ] Support ordering habits
