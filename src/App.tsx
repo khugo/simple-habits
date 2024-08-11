@@ -20,7 +20,7 @@ function App() {
 
   const page = getPage();
   return (
-    <GlobalStateProvider>
+    <GlobalStateProvider userId={session?.user?.id}>
       <PageLayout isLoggedIn={!!session}>{page}</PageLayout>
     </GlobalStateProvider>
   );

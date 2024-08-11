@@ -4,6 +4,7 @@ import { getDefaultDate } from "../utils/date.ts";
 type GlobalState = {
   state: {
     selectedDate: Date;
+    userId?: string;
   };
   updateSelectedDate: (newDate: Date) => void;
 };
@@ -12,13 +13,22 @@ const GlobalStateContext = createContext<GlobalState | null>(null);
 
 export const GlobalStateProvider = ({
   children,
+  userId,
 }: {
   children: React.ReactNode;
+  userId: string;
 }) => {
-  const [state, setState] = useState({ selectedDate: getDefaultDate() });
+  const [state, setState] = useState<GlobalState["state"]>({
+    selectedDate: getDefaultDate(),
+    userId,
+  });
+
+  if (userId !== state.userId) {
+    setState({ ...state, userId: userId });
+  }
 
   const updateSelectedDate = (newDate: Date) => {
-    setState({ selectedDate: newDate });
+    setState({ ...state, selectedDate: newDate });
   };
 
   return (

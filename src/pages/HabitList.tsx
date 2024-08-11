@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { Habit } from "../components/Habit";
 import _ from "lodash";
+import { RatingPicker } from "../components/RatingPicker.tsx";
+import { MoodRating } from "../components/MoodRating.tsx";
 
 export function HabitList() {
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -28,7 +30,8 @@ export function HabitList() {
   );
 
   return (
-    <div className="grid flex-col space-y-4 pb-2">
+    <div className="grid flex-col space-y-4 pb-2 justify-center">
+      <MoodRating />
       {sortedHabits.map((habit) => (
         <Habit habit={habit} key={habit.id} />
       ))}
