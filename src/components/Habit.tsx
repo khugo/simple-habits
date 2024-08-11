@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { ResponsiveCalendar } from "@nivo/calendar";
-import { format, isSameDay, startOfYear } from "date-fns";
-import { useActiveDate } from "../utils/date";
+import { endOfDay, format, isSameDay, startOfDay, startOfYear } from "date-fns";
+import { useGlobalState } from "../contexts/GlobalState.tsx";
 
 export type Habit = {
   id: string;
   name: string;
-  archivedAt?: Date
-  createdAt: Date
+  archivedAt?: Date;
+  createdAt: Date;
 };
 
 export type HabitEntry = {
@@ -21,19 +21,21 @@ export const Habit = (props: { habit: Habit }) => {
   const { data: habitEntries, reload } = useHabitEntries(props.habit.id);
   const [isDone, setIsDone] = useState<undefined | boolean>(undefined);
   const [submitLoading, setSubmitLoading] = useState(false);
-  const { activeDate } = useActiveDate();
+  const {
+    state: { selectedDate },
+  } = useGlobalState();
 
   useEffect(() => {
     if (!habitEntries) return;
     setIsDone(
       habitEntries.some((entry) =>
-        isSameDay(activeDate, new Date(entry.timestamp)),
+        isSameDay(selectedDate, new Date(entry.timestamp)),
       ),
     );
-  }, [isDone, habitEntries, activeDate]);
+  }, [isDone, habitEntries, selectedDate]);
 
   const addHabitEntry = async () => {
-    const timestamp = activeDate;
+    const timestamp = selectedDate;
     try {
       setSubmitLoading(true);
       await supabase.from("habits_entries").insert({

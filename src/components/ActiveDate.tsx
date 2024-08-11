@@ -1,17 +1,19 @@
 import { addDays, endOfDay, format, subDays } from "date-fns";
-
-import { useActiveDate } from "../utils/date";
+import { useGlobalState } from "../contexts/GlobalState.tsx";
 
 export const ActiveDate = () => {
-  const { activeDate, setActiveDate } = useActiveDate();
-  const isToday = endOfDay(new Date(activeDate)) >= endOfDay(new Date());
+  const {
+    state: { selectedDate },
+    updateSelectedDate,
+  } = useGlobalState();
+  const isToday = endOfDay(new Date(selectedDate)) >= endOfDay(new Date());
 
   const changeDate = (operation: "back" | "forward") => {
     if (operation === "back") {
-      setActiveDate(subDays(new Date(activeDate), 1).toISOString());
+      updateSelectedDate(subDays(new Date(selectedDate), 1));
     }
     if (operation === "forward" && !isToday) {
-      setActiveDate(addDays(new Date(activeDate), 1).toISOString());
+      updateSelectedDate(addDays(new Date(selectedDate), 1));
     }
   };
 
@@ -21,7 +23,9 @@ export const ActiveDate = () => {
         <span className="font-bold" onClick={() => changeDate("back")}>
           {"<"}
         </span>
-        <p className="mx-2">{format(new Date(activeDate), "E do, LLL")}</p>
+        <p className="mx-2 w-[115px] text-center">
+          {format(new Date(selectedDate), "E do, LLL")}
+        </p>
         {!isToday && (
           <span className="font-bold" onClick={() => changeDate("forward")}>
             {">"}

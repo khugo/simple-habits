@@ -3,6 +3,7 @@ import { supabase } from "./supabaseClient";
 import { HabitList } from "./pages/HabitList";
 import Auth from "./pages/Auth";
 import { PageLayout } from "./components/PageLayout";
+import { GlobalStateProvider } from "./contexts/GlobalState.tsx";
 
 function App() {
   const [session, setSession] = useState(undefined);
@@ -18,7 +19,11 @@ function App() {
   }, []);
 
   const page = getPage();
-  return <PageLayout isLoggedIn={!!session}>{page}</PageLayout>;
+  return (
+    <GlobalStateProvider>
+      <PageLayout isLoggedIn={!!session}>{page}</PageLayout>
+    </GlobalStateProvider>
+  );
 
   function getPage() {
     if (session === undefined) {

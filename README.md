@@ -14,4 +14,5 @@ You'll need to copy `.env.example` to `.env.local` and fill in the values.
 
 ## Production environment
 
-The backend is a Supabase app, and the frontend is a static site hosted on GitHub Pages.
+The backend is a Supabase app, and the frontend is a static site hosted on GitHub Pages. The frontend is deployed
+automatically when you push to the `master` branch.
