@@ -150,6 +150,7 @@ const HabitEntryCalendar = (props: {
   });
   return (
     <div
+      style={{ marginLeft: "-10px" }}
       dangerouslySetInnerHTML={{
         __html: svg.outerHTML,
       }}
