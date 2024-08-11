@@ -29,7 +29,7 @@ const RatingButton = (props: {
   return (
     <button
       onClick={props.onClick}
-      className={`p-4 border-2 leading-none rounded w-14 ${props.isSelected ? "bg-indigo-500 border-indigo-500 text-white" : "bg-gray-100 border-gray-200"}`}
+      className={`border-2 leading-none rounded w-12 h-12 ${props.isSelected ? "bg-indigo-500 border-indigo-500 text-white" : "bg-gray-100 border-gray-200"}`}
     >
       {props.rating}
     </button>
