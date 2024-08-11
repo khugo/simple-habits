@@ -2,10 +2,9 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { Habit } from "../components/Habit";
 import _ from "lodash";
-import { RatingPicker } from "../components/RatingPicker.tsx";
 import { MoodRating } from "../components/MoodRating.tsx";
 
-export function HabitList() {
+export function Home() {
   const [habits, setHabits] = useState<Habit[]>([]);
 
   useEffect(() => {

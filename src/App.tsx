@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
-import { HabitList } from "./pages/HabitList";
+import { Home } from "./pages/Home.tsx";
 import Auth from "./pages/Auth";
 import { PageLayout } from "./components/PageLayout";
 import { GlobalStateProvider } from "./contexts/GlobalState.tsx";
@@ -32,7 +32,7 @@ function App() {
     if (session === null) {
       return <Auth />;
     }
-    return <HabitList />;
+    return <Home />;
   }
 }
 
