@@ -15,7 +15,7 @@ export const PageLayout = (props: {
 const Header = () => {
   return (
     <div className="pb-3 w-full flex flex-col">
-      <h1 className="font-sans text-4xl mx-auto">Simple Habits</h1>
+      <h1 className="font-sans text-4xl mx-auto">Habitti</h1>
       <ActiveDate />
     </div>
   );
