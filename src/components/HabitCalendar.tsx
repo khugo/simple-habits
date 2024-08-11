@@ -12,8 +12,11 @@ export function HabitCalendar(
     formatDay = (i) => "SMTWTFS"[i],
     formatMonth = "%b",
     yFormat,
-    activeColor = "#838CF1", // Pink color for non-zero values
-    inactiveColor = "#eaeaea", // Light gray color for zero values
+    activeColor = "#838CF1",
+    inactiveColor = "#eaeaea",
+    highlightDate = null,
+    highlightColor = "#A8B4F6",
+    highlightWidth = 2,
   } = {},
 ) {
   // Compute values.
@@ -104,7 +107,41 @@ export function HabitCalendar(
     .attr("height", cellSize - 1)
     .attr("x", (i) => timeWeek.count(d3.timeYear(X[i]), X[i]) * cellSize + 0.5)
     .attr("y", (i) => countDay(X[i].getDay()) * cellSize + 0.5)
-    .attr("fill", (i) => (Y[i] === 0 ? inactiveColor : activeColor)); // Use gray for 0, pink for non-zero
+    .attr("fill", (i) => (Y[i] === 0 ? inactiveColor : activeColor))
+    .attr("stroke", (i) => {
+      if (highlightDate) {
+        const cellDate = X[i];
+        return cellDate.toDateString() === highlightDate.toDateString()
+          ? highlightColor
+          : "none";
+      }
+      return "none";
+    })
+    .attr("stroke-width", highlightWidth)
+    .attr("shape-rendering", "crispEdges");
+
+  // Adjust the size of highlighted cells to accommodate the inner stroke
+  cell
+    .filter((i) => {
+      if (highlightDate) {
+        const cellDate = X[i];
+        return cellDate.toDateString() === highlightDate.toDateString();
+      }
+      return false;
+    })
+    .attr("width", cellSize - 1 - highlightWidth)
+    .attr("height", cellSize - 1 - highlightWidth)
+    .attr(
+      "x",
+      (i) =>
+        timeWeek.count(d3.timeYear(X[i]), X[i]) * cellSize +
+        0.5 +
+        highlightWidth / 2,
+    )
+    .attr(
+      "y",
+      (i) => countDay(X[i].getDay()) * cellSize + 0.5 + highlightWidth / 2,
+    );
 
   if (title) cell.append("title").text(title);
 

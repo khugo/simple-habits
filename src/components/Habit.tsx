@@ -10,6 +10,8 @@ import {
 } from "date-fns";
 import { useGlobalState } from "../contexts/GlobalState.tsx";
 import { HabitCalendar } from "./HabitCalendar.tsx";
+import { Simulate } from "react-dom/test-utils";
+import select = Simulate.select;
 
 export type Habit = {
   id: string;
@@ -81,7 +83,10 @@ export const Habit = (props: { habit: Habit }) => {
         <p>Loading...</p>
       ) : (
         <>
-          <HabitEntryCalendar entries={habitEntries} />
+          <HabitEntryCalendar
+            entries={habitEntries}
+            selectedDate={selectedDate}
+          />
           <div className={"pt-2"}>
             <DoneButton
               onDone={addHabitEntry}
@@ -117,7 +122,10 @@ const DoneButton = (props: {
 
 const allDatesOfThisYear = getAllDatesOfThisYear();
 
-const HabitEntryCalendar = (props: { entries: HabitEntry[] }) => {
+const HabitEntryCalendar = (props: {
+  entries: HabitEntry[];
+  selectedDate: Date;
+}) => {
   const entriesByDate = useMemo(() => {
     return new Map(
       props.entries.map((entry) => [
@@ -138,6 +146,7 @@ const HabitEntryCalendar = (props: { entries: HabitEntry[] }) => {
     x: (d) => d.date,
     y: (d) => d.value,
     weekday: "monday",
+    highlightDate: props.selectedDate,
   });
   return (
     <div
