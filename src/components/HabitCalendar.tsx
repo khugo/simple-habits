@@ -7,7 +7,8 @@ export function HabitCalendar(
     y = ([, y]) => y,
     title,
     width = 928,
-    cellSize = 17,
+    cellSize = 15,
+    cellGap = 2,
     weekday = "monday",
     formatDay = (i) => "SMTWTFS"[i],
     formatMonth = "%b",
@@ -27,7 +28,7 @@ export function HabitCalendar(
   const countDay = weekday === "sunday" ? (i) => i : (i) => (i + 6) % 7;
   const timeWeek = weekday === "sunday" ? d3.timeWeek : d3.timeMonday;
   const weekDays = weekday === "weekday" ? 5 : 7;
-  const height = cellSize * (weekDays + 2);
+  const height = cellSize * (weekDays + 2) + cellGap * (weekDays + 1);
 
   // Construct formats.
   formatMonth = d3.timeFormat(formatMonth);
@@ -103,10 +104,13 @@ export function HabitCalendar(
         : ([, I]) => I,
     )
     .join("rect")
-    .attr("width", cellSize - 1)
-    .attr("height", cellSize - 1)
-    .attr("x", (i) => timeWeek.count(d3.timeYear(X[i]), X[i]) * cellSize + 0.5)
-    .attr("y", (i) => countDay(X[i].getDay()) * cellSize + 0.5)
+    .attr("width", cellSize - cellGap)
+    .attr("height", cellSize - cellGap)
+    .attr(
+      "x",
+      (i) => timeWeek.count(d3.timeYear(X[i]), X[i]) * cellSize + cellGap / 2,
+    )
+    .attr("y", (i) => countDay(X[i].getDay()) * cellSize + cellGap / 2)
     .attr("fill", (i) => (Y[i] === 0 ? inactiveColor : activeColor))
     .attr("stroke", (i) => {
       if (highlightDate) {
@@ -129,18 +133,19 @@ export function HabitCalendar(
       }
       return false;
     })
-    .attr("width", cellSize - 1 - highlightWidth)
-    .attr("height", cellSize - 1 - highlightWidth)
+    .attr("width", cellSize - cellGap - highlightWidth)
+    .attr("height", cellSize - cellGap - highlightWidth)
     .attr(
       "x",
       (i) =>
         timeWeek.count(d3.timeYear(X[i]), X[i]) * cellSize +
-        0.5 +
+        cellGap / 2 +
         highlightWidth / 2,
     )
     .attr(
       "y",
-      (i) => countDay(X[i].getDay()) * cellSize + 0.5 + highlightWidth / 2,
+      (i) =>
+        countDay(X[i].getDay()) * cellSize + cellGap / 2 + highlightWidth / 2,
     );
 
   if (title) cell.append("title").text(title);

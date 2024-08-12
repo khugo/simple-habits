@@ -87,7 +87,7 @@ export const Habit = (props: { habit: Habit }) => {
             entries={habitEntries}
             selectedDate={selectedDate}
           />
-          <div className={"pt-2"}>
+          <div className={"pt-1"}>
             <DoneButton
               onDone={addHabitEntry}
               onNotDone={removeHabitEntry}
@@ -150,7 +150,6 @@ const HabitEntryCalendar = (props: {
   });
   return (
     <div
-      style={{ marginLeft: "-10px" }}
       dangerouslySetInnerHTML={{
         __html: svg.outerHTML,
       }}

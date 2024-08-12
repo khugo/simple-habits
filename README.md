@@ -5,6 +5,8 @@ view of the full year for each habit. As such, the code is not written in a very
 
 The backend is using Supabase, and the frontend is a PWA hosted on GitHub Pages.
 
+New habits can currently only be added by writing to the DB, for example via the Supabase dashboard.
+
 ## Development
 
 This is a Supabase app. You need to have a Supabase account and a project set up to run this app. The DB schema
@@ -21,6 +23,6 @@ automatically when you push to the `master` branch.
 
 ## TODO
 
-- [ ] Highlight selected date in calendar
+- [x] Highlight selected date in calendar
 - [ ] Dark mode
 - [ ] Support ordering habits
