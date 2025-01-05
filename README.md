@@ -21,6 +21,10 @@ You'll need to copy `.env.example` to `.env.local` and fill in the values.
 The backend is a Supabase app, and the frontend is a static site hosted on GitHub Pages. The frontend is deployed
 automatically when you push to the `master` branch.
 
+## Backups
+
+Run `npm run dump-db` and store the .zip file somewhere.
+
 ## TODO
 
 - [x] Highlight selected date in calendar
