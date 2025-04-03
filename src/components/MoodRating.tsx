@@ -1,70 +1,42 @@
 import { useGlobalState } from "../contexts/GlobalState.tsx";
 import { RatingPicker } from "./RatingPicker.tsx";
-import { useEffect, useState } from "react";
-import { supabase } from "../supabaseClient.ts";
-
-type MoodHabitEntry = {
-  id: string;
-  date: Date;
-  rating: number;
-};
+import { useMoodRatings } from "../hooks/useMoodRatings";
 
 export const MoodRating = () => {
   const {
     state: { selectedDate },
   } = useGlobalState();
-  const [moodHabitEntriesByDate, setMoodHabitEntriesByDate] = useState<
-    Map<string, MoodHabitEntry> | undefined
-  >(undefined);
-  const {
-    state: { userId },
-  } = useGlobalState();
 
-  useEffect(() => {
-    void refreshMoodHabitEntries();
-  }, []);
+  const { moodRatingsByDate, updateMoodRating, error } = useMoodRatings();
 
-  async function refreshMoodHabitEntries() {
-    const { data } = await supabase.from("mood_rating_entries").select("*");
-    setMoodHabitEntriesByDate(
-      new Map<string, MoodHabitEntry>(
-        (data as any).map((r: any) => [
-          new Date(r.date).toISOString().split("T")[0],
-          r,
-        ]),
-      ),
-    );
-  }
-
-  const updateMoodRating = async (newRating: number) => {
+  const handleRatingSelect = async (newRating: number) => {
     try {
-      await supabase.from("mood_rating_entries").upsert(
-        {
-          date: selectedDate,
-          rating: newRating,
-          user_id: userId,
-        },
-        { onConflict: "user_id, date" },
-      );
-      await refreshMoodHabitEntries();
+      const dateStr = selectedDate.toISOString().split("T")[0];
+      await updateMoodRating(dateStr, newRating);
     } catch (e) {
-      alert(`Error updating mood rating: ${e}`);
+      // Error is already handled by the hook
+      console.error("Error updating mood rating:", e);
     }
   };
 
-  const currentValue = moodHabitEntriesByDate?.get(
-    selectedDate.toISOString().split("T")[0],
-  )?.rating;
+  const currentDate = selectedDate.toISOString().split("T")[0];
+  const currentValue = moodRatingsByDate?.get(currentDate)?.rating;
+
+  if (error) {
+    return (
+      <div className="text-red-500">
+        Error loading mood ratings: {error.message}
+      </div>
+    );
+  }
 
   return (
-    <div className={"flex flex-col items-center"}>
+    <div className="flex flex-col items-center">
       <RatingPicker
         range={{ start: 4, end: 10 }}
         selectedValue={currentValue}
-        onSelect={updateMoodRating}
+        onSelect={handleRatingSelect}
       />
     </div>
   );
 };
-
-const useMoodRatings = () => {};

@@ -1,21 +1,49 @@
 import { useState, useEffect } from "react";
-import { supabase } from "./supabaseClient";
 import { Home } from "./pages/Home.tsx";
 import Auth from "./pages/Auth";
 import { PageLayout } from "./components/PageLayout";
 import { GlobalStateProvider } from "./contexts/GlobalState.tsx";
+import { isAuthenticated, getCurrentUser, initGoogleAPI } from "./googleClient";
 
 function App() {
-  const [session, setSession] = useState(undefined);
+  const [session, setSession] = useState<any>(undefined);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session as any);
-    });
+    const initAuth = async () => {
+      try {
+        await initGoogleAPI();
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session as any);
-    });
+        if (isAuthenticated()) {
+          const user = getCurrentUser();
+          setSession({ user });
+        } else {
+          setSession(null);
+        }
+      } catch (error) {
+        console.error("Error initializing auth", error);
+        setSession(null);
+      } finally {
+        setInitialized(true);
+      }
+    };
+
+    initAuth();
+
+    // Listen for storage events (for token changes)
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === "google_access_token") {
+        if (event.newValue) {
+          const user = getCurrentUser();
+          setSession({ user });
+        } else {
+          setSession(null);
+        }
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   const page = getPage();
@@ -26,7 +54,7 @@ function App() {
   );
 
   function getPage() {
-    if (session === undefined) {
+    if (!initialized) {
       return <div>Loading...</div>;
     }
     if (session === null) {

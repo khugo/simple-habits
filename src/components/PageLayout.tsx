@@ -1,5 +1,5 @@
-import { supabase } from "../supabaseClient";
 import { ActiveDate } from "./ActiveDate";
+import { signOutFromGoogle } from "../googleClient";
 
 export const PageLayout = (props: {
   children: React.ReactNode;
@@ -24,8 +24,10 @@ const Header = () => {
 const Logout = () => {
   return (
     <button
+      className="mt-auto mb-4 py-2 px-4 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors self-center"
       onClick={() => {
-        supabase.auth.signOut();
+        signOutFromGoogle();
+        window.location.reload(); // Reload to update auth state
       }}
     >
       Logout

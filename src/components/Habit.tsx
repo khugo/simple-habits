@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { supabase } from "../supabaseClient";
 import {
   eachDayOfInterval,
   endOfDay,
@@ -11,66 +10,69 @@ import {
 import { useGlobalState } from "../contexts/GlobalState.tsx";
 import { HabitCalendar } from "./HabitCalendar.tsx";
 import { Simulate } from "react-dom/test-utils";
+import { useHabitEntries } from "../hooks/useHabitEntries";
+import { Habit as HabitType } from "../services/habit";
+import { HabitEntry as HabitEntryType } from "../services/habitEntry";
 import select = Simulate.select;
 
-export type Habit = {
-  id: string;
-  name: string;
-  archivedAt?: Date;
-  createdAt: Date;
-};
-
-export type HabitEntry = {
-  id: string;
-  habitId: string;
-  timestamp: string;
-};
+export type Habit = HabitType;
+export type HabitEntry = HabitEntryType;
 
 export const Habit = (props: { habit: Habit }) => {
-  const { data: habitEntries, reload } = useHabitEntries(props.habit.id);
+  const {
+    entries,
+    isLoading: entriesLoading,
+    addEntry,
+    deleteEntry,
+    refresh: reloadEntries,
+  } = useHabitEntries(props.habit.id);
+
   const [isDone, setIsDone] = useState<undefined | boolean>(undefined);
   const [submitLoading, setSubmitLoading] = useState(false);
+
   const {
     state: { selectedDate },
   } = useGlobalState();
 
   useEffect(() => {
-    if (!habitEntries) return;
+    if (entriesLoading) return;
+
     setIsDone(
-      habitEntries.some((entry) =>
-        isSameDay(selectedDate, new Date(entry.timestamp)),
-      ),
+      entries.some((entry) => isSameDay(selectedDate, entry.timestamp)),
     );
-  }, [isDone, habitEntries, selectedDate]);
+  }, [entries, entriesLoading, selectedDate]);
 
   const addHabitEntry = async () => {
-    const timestamp = selectedDate;
     try {
       setSubmitLoading(true);
-      await supabase.from("habits_entries").insert({
-        habit_id: props.habit.id,
-        timestamp,
-      });
-      await reload();
+      await addEntry(selectedDate);
       setIsDone(true);
+    } catch (error) {
+      console.error("Error adding habit entry:", error);
     } finally {
       setSubmitLoading(false);
     }
   };
 
   const removeHabitEntry = async () => {
-    const timeframeStart = startOfDay(selectedDate);
-    const timeframeEnd = endOfDay(selectedDate);
     try {
       setSubmitLoading(true);
-      await supabase
-        .from("habits_entries")
-        .delete()
-        .eq("habit_id", props.habit.id)
-        .gte("timestamp", timeframeStart.toISOString())
-        .lte("timestamp", timeframeEnd.toISOString());
-      await reload();
-      setIsDone(false);
+
+      // Find entries for the selected date
+      const entriesForDate = entries.filter((entry) =>
+        isSameDay(selectedDate, entry.timestamp),
+      );
+
+      if (entriesForDate.length > 0) {
+        // Delete all entries for the selected date
+        for (const entry of entriesForDate) {
+          await deleteEntry(entry.id);
+        }
+
+        setIsDone(false);
+      }
+    } catch (error) {
+      console.error("Error removing habit entry:", error);
     } finally {
       setSubmitLoading(false);
     }
@@ -79,14 +81,11 @@ export const Habit = (props: { habit: Habit }) => {
   return (
     <div className="flex flex-col">
       <h2 className="text-2xl">{props.habit.name}</h2>
-      {habitEntries === undefined || isDone === undefined ? (
+      {entriesLoading || isDone === undefined ? (
         <p>Loading...</p>
       ) : (
         <>
-          <HabitEntryCalendar
-            entries={habitEntries}
-            selectedDate={selectedDate}
-          />
+          <HabitEntryCalendar entries={entries} selectedDate={selectedDate} />
           <div className={"pt-1"}>
             <DoneButton
               onDone={addHabitEntry}
@@ -134,6 +133,7 @@ const HabitEntryCalendar = (props: {
       ]),
     );
   }, [props.entries]);
+
   const data = useMemo(
     () =>
       allDatesOfThisYear.map((date) => ({
@@ -142,12 +142,14 @@ const HabitEntryCalendar = (props: {
       })),
     [entriesByDate],
   );
+
   const svg = HabitCalendar(data, {
     x: (d) => d.date,
     y: (d) => d.value,
     weekday: "monday",
     highlightDate: props.selectedDate,
   });
+
   return (
     <div
       dangerouslySetInnerHTML={{
@@ -162,21 +164,3 @@ function getAllDatesOfThisYear() {
   const end = endOfYear(new Date());
   return eachDayOfInterval({ start, end });
 }
-
-const useHabitEntries = (habitId: string) => {
-  const [entries, setEntries] = useState<HabitEntry[] | undefined>(undefined);
-
-  const updateHabits = useCallback(async () => {
-    await supabase
-      .from("habits_entries")
-      .select("*")
-      .eq("habit_id", habitId)
-      .then(({ data }) => setEntries(data as HabitEntry[]));
-  }, [habitId]);
-
-  useEffect(() => {
-    void updateHabits();
-  }, [habitId, updateHabits]);
-
-  return { data: entries, reload: updateHabits };
-};
